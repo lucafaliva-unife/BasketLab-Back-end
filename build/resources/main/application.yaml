@@ -1,10 +1,10 @@
 spring:
   application:
-    name: webapp
+    name: basketlab
   datasource:
-    url: jdbc:mysql://localhost:3306/webapp
-    username: webapp
-    password: webapppassword
+    url: jdbc:mysql://localhost:3306/basketlab
+    username: basketlab
+    password: Basketlab2026@
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
