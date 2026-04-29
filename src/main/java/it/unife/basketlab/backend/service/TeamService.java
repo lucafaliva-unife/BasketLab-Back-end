@@ -7,6 +7,7 @@ import it.unife.basketlab.backend.DTO.TeamAnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.repository.TeamRepository;
+import jakarta.annotation.PostConstruct;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,8 @@ public class TeamService {
     @Autowired
     private TeamRepository repository;
 
+    private String svincolatiTeamName= "Svincolati";
+
     public List<Team> getTeams() {
         return repository.findAll();
     }
@@ -27,8 +30,8 @@ public class TeamService {
         return repository.findById(id);
     }
 
-    public Team saveTeam(Team entity) {
-        return repository.save(entity);
+    public Team saveTeam(Team team) {
+        return repository.save(team);
     }
 
     public void deleteTeamById(UUID id) {
@@ -37,6 +40,36 @@ public class TeamService {
 
     public boolean teamExistsById(UUID id) {
         return repository.existsById(id);
+    }
+
+    public boolean teamExistsByName(String name) {
+        List<Team> teams= getTeams();
+        for(Team team : teams) {
+            if(team.getNome().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Team getTeamByName(String name) {
+        List<Team> teams= getTeams();
+        for(Team team : teams) {
+            if(team.getNome().equals(svincolatiTeamName)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+    public boolean teamExistsByNameExcludeId(String name, UUID id) {
+        List<Team> teams= getTeams();
+        for(Team team : teams) {
+            if(team.getNome().equals(name) && !team.getId_team().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public TeamAnalyticsDTO getAnalyticsByTeamId(UUID id) {
@@ -49,12 +82,39 @@ public class TeamService {
     }
 
     public List<Player> getRankingByTeamId(UUID id) {
-        List<Player> ranking= repository.getRankingByTeamId(id);
+        List<Player> ranking= repository.getPlayersRankingByTeamId(id);
         if(ranking == null) {
             return Collections.emptyList();
         } else {
             return ranking;
         }
+    }
+
+    private void createSvincolati() {
+        if(!teamExistsByName(svincolatiTeamName)) {
+            Team svincolati= new Team();
+            svincolati.setNome(svincolatiTeamName);
+            svincolati.setCitta("/");
+            repository.save(svincolati);
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        createSvincolati();
+    }
+
+    public Team getTeamSvincolati() {
+        Team svincolati= getTeamByName(svincolatiTeamName);
+        if(svincolati == null) {
+            createSvincolati();
+            svincolati= getTeamSvincolati();
+        }
+        return svincolati;
+    }
+
+    public List<Team> getTeamsRanking() {
+        return repository.getTeamsRanking();
     }
 
 }

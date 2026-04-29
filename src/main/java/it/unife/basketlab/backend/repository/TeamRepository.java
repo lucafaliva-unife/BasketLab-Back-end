@@ -24,6 +24,15 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
             "GROUP BY p.id_player " +
             "ORDER BY CASE WHEN COUNT(t) > 0 THEN 0 ELSE 1 END ASC, " +
             "COALESCE((AVG(t.percentuale_tiri) + AVG(1.0 / t.tempo_corsa)) / 2, 0) DESC")
-    List<Player> getRankingByTeamId(UUID teamId);
+    List<Player> getPlayersRankingByTeamId(UUID teamId);
+
+    @Query("SELECT t FROM Team t " +
+            "LEFT JOIN Player p ON p.id_team = t.id_team " +
+            "LEFT JOIN Train tr ON tr.id_player = p.id_player " +
+            "WHERE t.nome <> 'Svincolati' " +
+            "GROUP BY t.id_team " +
+            "ORDER BY CASE WHEN COUNT(tr) > 0 THEN 0 ELSE 1 END ASC, " +
+            "COALESCE((AVG(tr.percentuale_tiri) + AVG(1.0 / tr.tempo_corsa)) / 2, 0) DESC")
+    List<Team> getTeamsRanking();
 
 }

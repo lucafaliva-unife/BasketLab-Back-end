@@ -16,7 +16,7 @@ public class Player {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private UUID id_player;
 
-    private String name;
+    private String nome;
 
     private String cognome;
 

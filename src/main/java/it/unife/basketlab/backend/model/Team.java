@@ -16,7 +16,7 @@ public class Team {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private UUID id_team;
 
-    private String name;
+    private String nome;
 
     private String citta;
 
