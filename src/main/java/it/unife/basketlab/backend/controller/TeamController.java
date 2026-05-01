@@ -48,6 +48,9 @@ public class TeamController {
         if(teamService.teamExistsByName(team.getNome()) || team.getNome().equals(svincolatiTeamName)) {
             return ResponseEntity.status(409).build();
         }
+        if(team.getCitta() == null || team.getNome() == null) {
+            return ResponseEntity.status(409).build();
+        }
         team.setId_team(null);
         teamService.saveTeam(team);
         return ResponseEntity.status(201).build();
@@ -62,6 +65,9 @@ public class TeamController {
             return ResponseEntity.notFound().build();
         }
         if(teamService.teamExistsByNameExcludeId(team.getNome(), id)) {
+            return ResponseEntity.status(409).build();
+        }
+        if(team.getCitta() == null || team.getNome() == null) {
             return ResponseEntity.status(409).build();
         }
         team.setId_team(id);
