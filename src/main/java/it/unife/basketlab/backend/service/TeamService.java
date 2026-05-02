@@ -62,6 +62,9 @@ public class TeamService {
         return null;
     }
 
+    /*
+    Funziona come teamExistsByName() ma permette di escludere un ID dalla ricerca.
+    */
     public boolean teamExistsByNameExcludeId(String name, UUID id) {
         List<Team> teams= getTeams();
         for(Team team : teams) {
@@ -75,7 +78,7 @@ public class TeamService {
     public TeamAnalyticsDTO getAnalyticsByTeamId(UUID id) {
         TeamAnalyticsDTO analytics= repository.getAnalyticsByTeamId(id);
         if(analytics == null) {
-            return new TeamAnalyticsDTO();
+            return new TeamAnalyticsDTO(); // Se il team selezionato non ha allenamenti, viene ritornato un TeamAnalyticsDTO con campi vuoti.
         } else {
             return analytics;
         }
@@ -84,12 +87,15 @@ public class TeamService {
     public List<Player> getRankingByTeamId(UUID id) {
         List<Player> ranking= repository.getPlayersRankingByTeamId(id);
         if(ranking == null) {
-            return Collections.emptyList();
+            return Collections.emptyList(); // Se il team selezionato non ha giocatori, viene ritornata una lista vuota.
         } else {
             return ranking;
         }
     }
 
+    /*
+    Crea il team degli svincolati solo se non esiste già un altro team che si chiama "Svincolati".
+    */
     private void createSvincolati() {
         if(!teamExistsByName(svincolatiTeamName)) {
             Team svincolati= new Team();
@@ -99,11 +105,17 @@ public class TeamService {
         }
     }
 
+    /*
+    Il DB viene inizializzato con il team degli svincolati.
+    */
     @PostConstruct
     public void init() {
         createSvincolati();
     }
 
+    /*
+    Ritorna il team degli svincolati se esiste, altrimenti se non esiste lo crea ed infine lo ritorna.
+    */
     public Team getTeamSvincolati() {
         Team svincolati= getTeamByName(svincolatiTeamName);
         if(svincolati == null) {

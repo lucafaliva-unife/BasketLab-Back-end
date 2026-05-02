@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.UUID;
@@ -16,8 +17,10 @@ public class Team {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private UUID id_team;
 
+    @NotBlank
     private String nome;
 
+    @NotBlank
     private String citta;
 
 }
