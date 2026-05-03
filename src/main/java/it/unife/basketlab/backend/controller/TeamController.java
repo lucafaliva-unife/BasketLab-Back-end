@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import it.unife.basketlab.backend.DTO.TeamAnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.service.PlayerService;
 import it.unife.basketlab.backend.service.TeamService;
-import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
