@@ -142,7 +142,7 @@ public class TeamController {
     /*
     Ritorna un oggetto di tipo TeamAnalyticsDTO contenente le medie dei dati di allenamento per il team selezionato.
     Usiamo un DTO apposito e non un oggetto di tipo Train per forzare ad escludere i campi "id_player" e "idx_train".
-    Se il team selezionato non ha allenamenti, viene ritornato un TeamAnalyticsDTO con campi vuoti.
+    Se il team selezionato non ha allenamenti, viene ritornato un TeamAnalyticsDTO senza campi.
     È vietato chiedere i dati di allenamento del team "Svincolati" perché non ha senso.
     Occorre quindi verificare che:
         -> l'ID del team selezionato esista;
@@ -185,6 +185,23 @@ public class TeamController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(teamService.getRankingByTeamId(id));
+    }
+
+    /*
+    Ritorna tutti i giocatori del team selezionato ordinati per inserimento nel DB.
+    Se non ci sono giocatori nel team allora ritorna una lista vuota.
+    Occorre prima verificare che:
+        -> l'ID del team selezionato esista;
+    Il codice di ritorno è:
+        -> "200 OK" se vengono passati tutti i controlli e viene restituita la lista di giocatori;
+        -> "404 Not Found" se l'ID passato non esiste;
+    */
+    @GetMapping("/{id}/players")
+    public ResponseEntity<List<Player>> getPlayersByTeamId(@PathVariable UUID id) {
+        if(!teamService.teamExistsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(playerService.getPlayersByTeamId(id));
     }
 
 }

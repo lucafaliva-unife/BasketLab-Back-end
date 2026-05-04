@@ -1,5 +1,6 @@
 package it.unife.basketlab.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,11 +28,22 @@ public class PlayerService {
     @Transactional
     public void movePlayersToSvincolatiByTeamId(UUID id) {
         UUID svincolatiId= teams.getTeamSvincolati().getId_team();
-        List<Player> players = getAllPlayers().stream()
+        List<Player> players= getAllPlayers().stream()
         .filter(player -> id.equals(player.getId_team()))
         .peek(player -> player.setId_team(svincolatiId))
         .collect(Collectors.toList());
         repository.saveAll(players);
+    }
+
+    public List<Player> getPlayersByTeamId(UUID id) {
+        List<Player> allPlayers= getAllPlayers();
+        List<Player> filteredPlayers= new ArrayList<>();
+        for(Player player : allPlayers) {
+            if(player.getId_team().equals(id)) {
+                filteredPlayers.add(player);
+            }
+        }
+        return filteredPlayers;
     }
 
 }

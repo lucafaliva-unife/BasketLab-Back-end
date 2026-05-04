@@ -9,7 +9,6 @@ import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.repository.TeamRepository;
 import jakarta.annotation.PostConstruct;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,20 +76,12 @@ public class TeamService {
 
     public TeamAnalyticsDTO getAnalyticsByTeamId(UUID id) {
         TeamAnalyticsDTO analytics= repository.getAnalyticsByTeamId(id);
-        if(analytics == null) {
-            return new TeamAnalyticsDTO(); // Se il team selezionato non ha allenamenti, viene ritornato un TeamAnalyticsDTO con campi vuoti.
-        } else {
-            return analytics;
-        }
+        return analytics;
     }
 
     public List<Player> getRankingByTeamId(UUID id) {
         List<Player> ranking= repository.getPlayersRankingByTeamId(id);
-        if(ranking == null) {
-            return Collections.emptyList(); // Se il team selezionato non ha giocatori, viene ritornata una lista vuota.
-        } else {
-            return ranking;
-        }
+        return ranking;
     }
 
     /*
