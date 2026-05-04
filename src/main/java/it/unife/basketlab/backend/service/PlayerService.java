@@ -2,6 +2,7 @@ package it.unife.basketlab.backend.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,10 @@ public class PlayerService {
         return repository.findAll();
     }
 
+    public Optional<Player> getPlayerById(UUID id) {
+        return repository.findById(id);
+    }
+
     @Transactional
     public void movePlayersToSvincolatiByTeamId(UUID id) {
         UUID svincolatiId= teams.getTeamSvincolati().getId_team();
@@ -44,6 +49,18 @@ public class PlayerService {
             }
         }
         return filteredPlayers;
+    }
+
+    public Player savePlayer(Player player) {
+        return repository.save(player);
+    }
+
+    public boolean playerExistsById(UUID id) {
+        return repository.existsById(id);
+    }
+
+    public void deletePlayerById(UUID id) {
+        repository.deleteById(id);
     }
 
 }

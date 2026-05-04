@@ -3,7 +3,7 @@ package it.unife.basketlab.backend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.unife.basketlab.backend.DTO.TeamAnalyticsDTO;
+import it.unife.basketlab.backend.DTO.AnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.repository.TeamRepository;
@@ -74,8 +74,8 @@ public class TeamService {
         return false;
     }
 
-    public TeamAnalyticsDTO getAnalyticsByTeamId(UUID id) {
-        TeamAnalyticsDTO analytics= repository.getAnalyticsByTeamId(id);
+    public AnalyticsDTO getAnalyticsByTeamId(UUID id) {
+        AnalyticsDTO analytics= repository.getAnalyticsByTeamId(id);
         return analytics;
     }
 

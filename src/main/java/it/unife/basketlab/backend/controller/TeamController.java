@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import it.unife.basketlab.backend.DTO.TeamAnalyticsDTO;
+import it.unife.basketlab.backend.DTO.AnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.service.PlayerService;
@@ -74,7 +74,7 @@ public class TeamController {
             -> il team passato si chiama "Svincolati";
     */
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid Team team) {
+    public ResponseEntity<Void> createTeam(@RequestBody @Valid Team team) {
         if(teamService.teamExistsByName(team.getNome()) || team.getNome().equals(svincolatiTeamName)) {
             return ResponseEntity.status(409).build();
         }
@@ -126,7 +126,7 @@ public class TeamController {
         -> "409 Conflict" se l'ID passato è l'ID del team degli svincolati;
     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteTeamById(@PathVariable UUID id) {
         if(id.equals(teamService.getTeamSvincolati().getId_team())) {
             return ResponseEntity.status(409).build();
         }
@@ -153,7 +153,7 @@ public class TeamController {
         -> "409 Conflict" se l'ID passato è quello del team "Svincolati";
     */
     @GetMapping("/{id}/analytics")
-    public ResponseEntity<TeamAnalyticsDTO> getAnalyticsByTeamId(@PathVariable UUID id) {
+    public ResponseEntity<AnalyticsDTO> getAnalyticsByTeamId(@PathVariable UUID id) {
         if(id.equals(teamService.getTeamSvincolati().getId_team())) {
             return ResponseEntity.status(409).build();
         }

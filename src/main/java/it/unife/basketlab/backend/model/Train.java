@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -15,10 +14,9 @@ import java.util.UUID;
 public class Train {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private UUID idx_train;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long idx_train;
 
-    @NotBlank
     private UUID id_player;
 
     @NotNull

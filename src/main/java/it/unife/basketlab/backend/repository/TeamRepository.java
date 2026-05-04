@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import it.unife.basketlab.backend.DTO.TeamAnalyticsDTO;
+import it.unife.basketlab.backend.DTO.AnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
 
@@ -17,7 +17,7 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
     @Query("SELECT new it.unife.basketlab.backend.DTO.TeamAnalyticsDTO(AVG(t.tempo_corsa), AVG(t.percentuale_tiri)) " +
             "FROM Train t, Player p " +
             "WHERE t.id_player = p.id_player AND p.id_team = :teamId")
-    TeamAnalyticsDTO getAnalyticsByTeamId(UUID teamId);
+    AnalyticsDTO getAnalyticsByTeamId(UUID teamId);
 
     @Query("SELECT p FROM Player p LEFT JOIN Train t ON t.id_player = p.id_player " +
             "WHERE p.id_team = :teamId " +
