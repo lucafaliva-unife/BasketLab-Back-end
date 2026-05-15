@@ -33,7 +33,7 @@ public class Player {
     @NotNull
     private float altezza;
 
-    @NotBlank
+    @NotNull
     private UUID id_team;
 
 }

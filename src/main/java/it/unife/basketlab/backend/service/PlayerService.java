@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.unife.basketlab.backend.model.Player;
+import it.unife.basketlab.backend.model.Team;
 import it.unife.basketlab.backend.repository.PlayerRepository;
+import it.unife.basketlab.backend.repository.TeamRepository;
 
 @Service
 public class PlayerService {
@@ -20,7 +22,7 @@ public class PlayerService {
     private PlayerRepository repository;
 
     @Autowired
-    private TeamService teams;
+    private TeamRepository teamRepository;
 
     public List<Player> getAllPlayers() {
         return repository.findAll();
@@ -32,11 +34,19 @@ public class PlayerService {
 
     @Transactional
     public void movePlayersToSvincolatiByTeamId(UUID id) {
-        UUID svincolatiId= teams.getTeamSvincolati().getId_team();
-        List<Player> players= getAllPlayers().stream()
-        .filter(player -> id.equals(player.getId_team()))
-        .peek(player -> player.setId_team(svincolatiId))
-        .collect(Collectors.toList());
+        // Trova il team "Svincolati" direttamente dal repository
+        Team svincolatiTeam= teamRepository.findAll().stream()
+            .filter(team -> team.getNome().equals("Svincolati"))
+            .findFirst()
+            .orElse(null);
+        if(svincolatiTeam == null) {
+            return; // Se il team Svincolati non esiste, non fare nulla
+        }
+        UUID svincolatiId= svincolatiTeam.getId_team();
+        List<Player> players = getAllPlayers().stream()
+            .filter(player -> id.equals(player.getId_team()))
+            .peek(player -> player.setId_team(svincolatiId))
+            .collect(Collectors.toList());
         repository.saveAll(players);
     }
 

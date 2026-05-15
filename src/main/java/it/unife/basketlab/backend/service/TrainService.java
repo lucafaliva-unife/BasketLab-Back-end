@@ -16,6 +16,10 @@ public class TrainService {
     @Autowired
     private TrainRepository repository;
 
+    public List<Train> getTrains() {
+        return repository.findAll();
+    }
+
     public List<Train> getTrainsByPlayerId(UUID id) {
         List<Train> allTrains= repository.findAll();
         List<Train> trainsFiltered= new ArrayList<>();

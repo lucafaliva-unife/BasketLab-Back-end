@@ -101,7 +101,7 @@ public class TeamController {
     */
     @PutMapping("/{id}")
     public ResponseEntity<Void> editTeamById(@PathVariable UUID id, @RequestBody @Valid Team team) {
-        if(team.getNome().equals("Svincolati") || team.getId_team().equals(teamService.getTeamSvincolati().getId_team())) {
+        if(team.getNome().equals("Svincolati") || id.equals(teamService.getTeamSvincolati().getId_team())) {
             return ResponseEntity.status(409).build();
         }
         if(!teamService.teamExistsById(id)) {

@@ -87,7 +87,7 @@ public class PlayerController {
         if(!teamService.teamExistsById(player.getId_team())) {
             return ResponseEntity.status(409).build();
         }
-        player.setId_team(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "player" non si rischia di modificare il player sbagliato o peggio di crearne uno nuovo.
+        player.setId_player(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "player" non si rischia di modificare il player sbagliato o peggio di crearne uno nuovo.
         playerService.savePlayer(player);
         return ResponseEntity.noContent().build();
     }
@@ -136,7 +136,7 @@ public class PlayerController {
         -> "409 Conflict" se il giocatore da allenare è svincolato;
     */
     @PostMapping("/{id}/train")
-    public ResponseEntity<List<Train>> trainPlayerById(@PathVariable UUID id, @RequestBody @Valid Train train) {
+    public ResponseEntity<Void> trainPlayerById(@PathVariable UUID id, @RequestBody @Valid Train train) {
         if(!playerService.playerExistsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -145,7 +145,7 @@ public class PlayerController {
         }
         train.setId_player(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "train" non si rischia di modificare un allenamento vecchio.
         trainService.saveTrain(train);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(201).build();
     }
 
 }
