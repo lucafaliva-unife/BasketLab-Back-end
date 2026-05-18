@@ -11,11 +11,9 @@ import it.unife.basketlab.backend.repository.TeamRepository;
 import jakarta.annotation.PostConstruct;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class TeamService {
@@ -85,88 +83,110 @@ public class TeamService {
     }
 
     public AnalyticsDTO getAnalyticsByTeamId(UUID teamId) {
-        List<Player> teamPlayers= playerService.getPlayersByTeamId(teamId);
-        List<Train> allTrains= trainService.getTrains();
-        List<Train> teamTrains= allTrains.stream()
-            .filter(train -> teamPlayers.stream()
-                .anyMatch(player -> player.getId_player().equals(train.getId_player())))
-            .collect(Collectors.toList());
-        
+        List<Train> teamTrains= new ArrayList<Train>();
+        // Filtro gli allenamenti relativi soltanto ai giocatori del team selezionato
+        teamTrains= trainService.getTrainsByTeamId(teamId);
+        // Se il team selezionato non possiede allenamenti allora ritorno un DTO vuoto
         if(teamTrains.isEmpty()) {
             return new AnalyticsDTO(null, null);
         }
-        Double avgTempCorsa= teamTrains.stream()
-            .mapToDouble(Train::getTempo_corsa)
-            .average()
-            .orElse(0.0);
-            
-        Double avgPercentualeTiri= teamTrains.stream()
-            .mapToDouble(Train::getPercentuale_tiri)
-            .average()
-            .orElse(0.0);
-        return new AnalyticsDTO(avgTempCorsa, avgPercentualeTiri);
+        // Se il team ha almeno un allenamento, calcolo la media del tempo corsa e la media della % tiri
+        Double percentualeTiri= Double.valueOf(0);
+        Double tempoCorsa= Double.valueOf(0);
+        for(Train t : teamTrains) {
+            percentualeTiri+= t.getPercentuale_tiri();
+            tempoCorsa+= t.getTempo_corsa();
+        }
+        percentualeTiri/= teamTrains.size();
+        tempoCorsa/= teamTrains.size();
+        return new AnalyticsDTO(tempoCorsa, percentualeTiri);
     }
 
+    /*
+    Restituisce la classifica dei giocatori del team richiesto.
+    Per ogni giocatore:
+      - usa gli allenamenti del giocatore per calcolare il punteggio di performance;
+      - mette prima chi ha almeno un allenamento e dopo chi non ne ha;
+      - ordina chi ha allenamenti in base al punteggio totale (decrescente);
+    */
     public List<Player> getRankingByTeamId(UUID teamId) {
         List<Player> teamPlayers= playerService.getPlayersByTeamId(teamId);
-        List<Train> allTrains= trainService.getTrains();
-        return teamPlayers.stream()
-            .sorted((p1, p2) -> {
-                List<Train> p1Trains = allTrains.stream()
-                    .filter(train -> train.getId_player().equals(p1.getId_player()))
-                    .collect(Collectors.toList());
-                List<Train> p2Trains = allTrains.stream()
-                    .filter(train -> train.getId_player().equals(p2.getId_player()))
-                    .collect(Collectors.toList());
-                // Players with training first
-                if((p1Trains.isEmpty() ? 0 : 1) != (p2Trains.isEmpty() ? 0 : 1)) {
-                    return (p2Trains.isEmpty() ? 0 : 1) - (p1Trains.isEmpty() ? 0 : 1);
-                }
-                // Sort by performance score (avg percentuale_tiri + avg 1/tempo_corsa) / 2
-                Double p1Score = p1Trains.isEmpty() ? 0.0 : 
-                    (p1Trains.stream().mapToDouble(Train::getPercentuale_tiri).average().orElse(0.0) +
-                     p1Trains.stream().mapToDouble(t -> 1.0 / t.getTempo_corsa()).average().orElse(0.0)) / 2;    
-                Double p2Score = p2Trains.isEmpty() ? 0.0 :
-                    (p2Trains.stream().mapToDouble(Train::getPercentuale_tiri).average().orElse(0.0) +
-                     p2Trains.stream().mapToDouble(t -> 1.0 / t.getTempo_corsa()).average().orElse(0.0)) / 2;
-                return p2Score.compareTo(p1Score);
-            })
-            .collect(Collectors.toList());
+        List<Player> ranking= new ArrayList<>(teamPlayers);
+        ranking.sort((p1, p2) -> {
+            List<Train> p1Trains= trainService.getTrainsByPlayerId(p1.getId_player());
+            List<Train> p2Trains= trainService.getTrainsByPlayerId(p2.getId_player());
+            // Metto prima i giocatori con allenamenti
+            boolean p1HasTrain= !p1Trains.isEmpty();
+            boolean p2HasTrain= !p2Trains.isEmpty();
+            if(p1HasTrain != p2HasTrain) {
+                return p1HasTrain ? -1 : 1;
+            }
+            // Se entrambi hanno allenamenti, confronto il punteggio di performance
+            Double p1Score= getPerformanceScore(p1Trains);
+            Double p2Score= getPerformanceScore(p2Trains);
+            return p2Score.compareTo(p1Score);
+        });
+        return ranking;
     }
 
+    /*
+    Restituisce l'elenco di tutti i team ordinati in base alle performance di allenamento calcolate secondo il metodo
+    getPerformanceScore() (ordine decrescente, dal più prestante al meno prestante).
+    Include anche i team senza allenamenti ma li inserisce in fondo alla classifica, mantenendo l'ordine originale.
+    Mette sempre per ultimo il team degli svincolati.
+    */
     public List<Team> getTeamsRanking() {
-        List<Team> allTeams= getTeams().stream()
-            .filter(team -> !team.getNome().equals(svincolatiTeamName))
-            .collect(Collectors.toList());
-        List<Player> allPlayers= playerService.getAllPlayers();
-        List<Train> allTrains= trainService.getTrains();
-        return allTeams.stream()
-            .sorted((t1, t2) -> {
-                List<Train> t1Trains= allTrains.stream()
-                    .filter(train -> allPlayers.stream()
-                        .filter(p -> p.getId_team().equals(t1.getId_team()))
-                        .anyMatch(p -> p.getId_player().equals(train.getId_player())))
-                    .collect(Collectors.toList());
-                List<Train> t2Trains= allTrains.stream()
-                    .filter(train -> allPlayers.stream()
-                        .filter(p -> p.getId_team().equals(t2.getId_team()))
-                        .anyMatch(p -> p.getId_player().equals(train.getId_player())))
-                    .collect(Collectors.toList());
-                // Teams with training first
-                if((t1Trains.isEmpty() ? 0 : 1) != (t2Trains.isEmpty() ? 0 : 1)) {
-                    return (t2Trains.isEmpty() ? 0 : 1) - (t1Trains.isEmpty() ? 0 : 1);
-                }
-                // Sort by performance score
-                Double t1Score = t1Trains.isEmpty() ? 0.0 :
-                    (t1Trains.stream().mapToDouble(Train::getPercentuale_tiri).average().orElse(0.0) +
-                     t1Trains.stream().mapToDouble(t -> 1.0 / t.getTempo_corsa()).average().orElse(0.0)) / 2;
-                     
-                Double t2Score = t2Trains.isEmpty() ? 0.0 :
-                    (t2Trains.stream().mapToDouble(Train::getPercentuale_tiri).average().orElse(0.0) +
-                     t2Trains.stream().mapToDouble(t -> 1.0 / t.getTempo_corsa()).average().orElse(0.0)) / 2;
-                return t2Score.compareTo(t1Score);
-            })
-            .collect(Collectors.toList());
+        // Raccolgo tutti i team, tranne gli svincolati
+        List<Team> allTeams= new ArrayList<>();
+        for(Team team : getTeams()) {
+            if(!team.getNome().equals(svincolatiTeamName)) {
+                allTeams.add(team);
+            }
+        }
+        // Copio la lista di tutti i team (senza "Svincolati" e la ordino per performance)
+        List<Team> ranking= new ArrayList<>(allTeams);
+        ranking.sort((t1, t2) -> {
+            List<Train> t1Trains= trainService.getTrainsByTeamId(t1.getId_team());
+            List<Train> t2Trains= trainService.getTrainsByTeamId(t2.getId_team());
+            // Faccio andare in fondo alla classifica i team senza allenamenti
+            boolean t1HasTrain= !t1Trains.isEmpty();
+            boolean t2HasTrain= !t2Trains.isEmpty();
+            if(t1HasTrain != t2HasTrain) {
+                return t1HasTrain ? -1 : 1;
+            }
+            // Definisco la regola per ordinare i team
+            Double t1Score= getPerformanceScore(t1Trains);
+            Double t2Score= getPerformanceScore(t2Trains);
+            return t2Score.compareTo(t1Score);
+        });
+        // Inserisco alla fine della classifica il team degli svincolati
+        ranking.add(getTeamSvincolati());
+        return ranking;
+    }
+
+    /*
+    Data una lista di allenamenti, esegue i seguenti passaggi sugli elementi:
+    1) calcola la media complessiva della % tiri e del tempo corsa invertito (1 / tempo corsa).
+       Il risultato ottenuto è un insieme di due numeri: % tiri media e tempo corsa media (invertita);
+    2) dati i due numeri appena calcolati, calcola la media dei due valori con:
+       (% tiri media + tempo corsa media invertita) / 2.
+       Il risultato ottenuto è un numero reale (Double).
+    */
+    private Double getPerformanceScore(List<Train> trains) {
+        // Se la lista di allenamenti è vuota allora ritorno 0.0
+        if(trains.isEmpty()) {
+            return 0.0;
+        }
+        // Calcolo le performance e ritorno il valore risultante
+        double percentualeTiriSum= 0.0;
+        double invertedTempoSum= 0.0;
+        for (Train t : trains) {
+            percentualeTiriSum += t.getPercentuale_tiri();
+            invertedTempoSum += 1.0 / t.getTempo_corsa();
+        }
+        double avgPercentualeTiri= percentualeTiriSum / trains.size();
+        double avgInvertedTempo= invertedTempoSum / trains.size();
+        return (avgPercentualeTiri + avgInvertedTempo) / 2.0;
     }
 
     /*

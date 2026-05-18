@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,18 +34,21 @@ public class PlayerService {
     @Transactional
     public void movePlayersToSvincolatiByTeamId(UUID id) {
         // Trova il team "Svincolati" direttamente dal repository
-        Team svincolatiTeam= teamRepository.findAll().stream()
-            .filter(team -> team.getNome().equals("Svincolati"))
-            .findFirst()
-            .orElse(null);
+        Team svincolatiTeam= null;
+        for(Team team : teamRepository.findAll()) {
+            if(team.getNome().equals("Svincolati")) {
+                svincolatiTeam= team;
+                break;
+            }
+        }
         if(svincolatiTeam == null) {
             return; // Se il team Svincolati non esiste, non fare nulla
         }
-        UUID svincolatiId= svincolatiTeam.getId_team();
-        List<Player> players = getAllPlayers().stream()
-            .filter(player -> id.equals(player.getId_team()))
-            .peek(player -> player.setId_team(svincolatiId))
-            .collect(Collectors.toList());
+        // Seleziona tutti i giocatori del team e modifica il loro Id_team nell'ID del team "Svincolati"
+        List<Player> players= getPlayersByTeamId(id);
+        for(Player player : players) {
+            player.setId_team(svincolatiTeam.getId_team());
+        }
         repository.saveAll(players);
     }
 

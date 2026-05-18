@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Train;
 import it.unife.basketlab.backend.repository.TrainRepository;
 
@@ -15,6 +16,9 @@ public class TrainService {
     
     @Autowired
     private TrainRepository repository;
+
+    @Autowired
+    private PlayerService playerService;
 
     public List<Train> getTrains() {
         return repository.findAll();
@@ -29,6 +33,16 @@ public class TrainService {
             }
         }
         return trainsFiltered;
+    }
+
+    public List<Train> getTrainsByTeamId(UUID id) {
+        List<Train> teamTrains= new ArrayList<>();
+        for(Player p : playerService.getPlayersByTeamId(id)) {
+            for(Train t : getTrainsByPlayerId(p.getId_player())) {
+                teamTrains.add(t);
+            }
+        }
+        return teamTrains;
     }
 
     public void saveTrain(Train train) {
