@@ -166,7 +166,7 @@ public class TeamService {
 
     /*
     Data una lista di allenamenti, esegue i seguenti passaggi sugli elementi:
-    1) calcola la media complessiva della % tiri e del tempo corsa invertito (10 / tempo corsa).
+    1) calcola la media complessiva della % tiri e del tempo corsa invertito (100 / tempo corsa).
        Il risultato ottenuto è un insieme di due numeri: % tiri media e tempo corsa media (invertita);
     2) dati i due numeri appena calcolati, calcola la media dei due valori con:
        (% tiri media + tempo corsa media invertita) / 2.
@@ -182,7 +182,7 @@ public class TeamService {
         double invertedTempoSum= 0.0;
         for(Train t : trains) {
             percentualeTiriSum+= t.getPercentuale_tiri();
-            invertedTempoSum+= 10.0 / t.getTempo_corsa();
+            invertedTempoSum+= 100.0 / t.getTempo_corsa();
         }
         double avgPercentualeTiri= percentualeTiriSum / trains.size();
         double avgInvertedTempo= invertedTempoSum / trains.size();
