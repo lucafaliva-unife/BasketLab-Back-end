@@ -29,26 +29,45 @@ public class TeamService {
 
     private String svincolatiTeamName= "Svincolati";
 
+    /*
+    Ritorna tutti i team presenti.
+    */
     public List<Team> getTeams() {
         return repository.findAll();
     }
 
+    /*
+    Ritorna il team che ha come ID l'ID passato.
+    */
     public Optional<Team> getTeamById(UUID id) {
         return repository.findById(id);
     }
 
+    /*
+    Salva un nuovo team se l'ID del team passato non è già presente, altrimenti modifica quello già presente.
+    Infine ritorna la risposta HTTP.
+    */
     public Team saveTeam(Team team) {
         return repository.save(team);
     }
 
+    /*
+    Elimina il team che ha come ID l'ID passato e ritorna la risposta HTTP.
+    */
     public void deleteTeamById(UUID id) {
         repository.deleteById(id);
     }
 
+    /*
+    Ritorna un booleano che indica se esiste un team che ha come ID l'ID passato.
+    */
     public boolean teamExistsById(UUID id) {
         return repository.existsById(id);
     }
 
+    /*
+    Ritorna un booleano che indica se esiste un team che ha come nome la stringa passata.
+    */
     public boolean teamExistsByName(String name) {
         List<Team> teams= getTeams();
         for(Team team : teams) {
@@ -59,6 +78,9 @@ public class TeamService {
         return false;
     }
 
+    /*
+    Ritorna il team che ha come nome la stringa passata. Se non esiste, ritorna null.
+    */
     public Team getTeamByName(String name) {
         List<Team> teams= getTeams();
         for(Team team : teams) {
@@ -82,6 +104,10 @@ public class TeamService {
         return false;
     }
 
+    /*
+    Ritorna gli analytics del team che ha come ID l'ID passato facendo le medie dei dati di allenamento dei suoi giocatori.
+    L'oggetto ritornato è un DTO di tipo AnalyticsDTO, e se il team non ha allenamenti allora ritorna un DTO vuoto.
+    */
     public AnalyticsDTO getAnalyticsByTeamId(UUID teamId) {
         List<Train> teamTrains= new ArrayList<Train>();
         // Filtro gli allenamenti relativi soltanto ai giocatori del team selezionato

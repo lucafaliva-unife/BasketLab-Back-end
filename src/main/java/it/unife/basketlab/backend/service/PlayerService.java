@@ -23,14 +23,23 @@ public class PlayerService {
     @Autowired
     private TeamRepository teamRepository;
 
+    /*
+    Ritorna l'elenco di tutti i giocatori.
+    */
     public List<Player> getAllPlayers() {
         return repository.findAll();
     }
 
+    /*
+    Ritorna il giocatore che ha come ID l'ID passato.
+    */
     public Optional<Player> getPlayerById(UUID id) {
         return repository.findById(id);
     }
 
+    /*
+    Sposta i giocatori del team che ha come ID l'ID passato verso il team degli svincolati.
+    */
     @Transactional
     public void movePlayersToSvincolatiByTeamId(UUID id) {
         // Trova il team "Svincolati" direttamente dal repository
@@ -52,6 +61,9 @@ public class PlayerService {
         repository.saveAll(players);
     }
 
+    /*
+    Ritorna tutti i giocatori del team che ha come ID l'ID passato.
+    */
     public List<Player> getPlayersByTeamId(UUID id) {
         List<Player> allPlayers= getAllPlayers();
         List<Player> filteredPlayers= new ArrayList<>();
@@ -63,14 +75,24 @@ public class PlayerService {
         return filteredPlayers;
     }
 
+    /*
+    Salva un nuovo giocatore se l'ID del giocatore passato non è già presente, altrimenti modifica quello già presente.
+    Infine ritorna la risposta HTTP.
+    */
     public Player savePlayer(Player player) {
         return repository.save(player);
     }
 
+    /*
+    Ritorna un booleano che indica se esiste un giocatore che ha come ID l'ID passato.
+    */
     public boolean playerExistsById(UUID id) {
         return repository.existsById(id);
     }
 
+    /*
+    Elimina il giocatore che ha come ID l'ID passato e ritorna la risposta HTTP.
+    */
     public void deletePlayerById(UUID id) {
         repository.deleteById(id);
     }

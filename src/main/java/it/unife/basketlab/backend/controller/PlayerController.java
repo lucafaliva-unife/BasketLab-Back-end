@@ -43,13 +43,16 @@ public class PlayerController {
         -> aver verificato che l'ID del team all'interno del giocatore passato non sia l'ID del team degli svincolati;
     Il codice di ritorno è:
         -> "201 Created" se i controlli vengono passati ed il giocatore viene creato correttamente;
-        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (not blank e not null);
+        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (anche not blank e not null);
         -> "409 Conflict" se l'ID del team all'interno del giocatore passato è l'ID del team degli svincolati;
     */
     @PostMapping
     public ResponseEntity<Void> createPlayer(@RequestBody @Valid Player player) {
         if(player.getId_team().equals(teamService.getTeamSvincolati().getId_team())) {
             return ResponseEntity.status(409).build();
+        }
+        if(player.getPeso() < 30 || player.getPeso() > 300 || player.getAltezza() < 100 || player.getAltezza() > 250) {
+            return ResponseEntity.status(400).build();
         }
         player.setId_player(null); // L'ID viene reso nullo per assicurarsi di non sovrascrivere un giocatore esistente, nel caso in cui il client invii un ID.
         playerService.savePlayer(player);
@@ -75,7 +78,7 @@ public class PlayerController {
         -> essersi assicurato che l'ID del team del giocatore esista;
     Il codice di ritorno è:
         -> "204 No Content" se vengono superati tutti i controlli ed il team viene modificato correttamente;
-        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (not blank e not null);
+        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (anche not blank e not null);
         -> "404 Not Found" se l'ID passato non esiste;
         -> "409 Conflict" se l'ID del team del giocatore non esiste;
     */
@@ -86,6 +89,9 @@ public class PlayerController {
         }
         if(!teamService.teamExistsById(player.getId_team())) {
             return ResponseEntity.status(409).build();
+        }
+        if(player.getPeso() < 30 || player.getPeso() > 300 || player.getAltezza() < 100 || player.getAltezza() > 250) {
+            return ResponseEntity.status(400).build();
         }
         player.setId_player(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "player" non si rischia di modificare il player sbagliato o peggio di crearne uno nuovo.
         playerService.savePlayer(player);
@@ -132,7 +138,7 @@ public class PlayerController {
     Il codice di ritorno è:
         -> "201 OK" se vengono passati i controlli e viene creato correttamente l'allenamento;
         -> "404 Not Found" se l'ID del giocatore non esiste;
-        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (not null);
+        -> "400 Bad Request" se l'oggetto passato non supera i controlli di validazione dei campi (anche not null);
         -> "409 Conflict" se il giocatore da allenare è svincolato;
     */
     @PostMapping("/{id}/train")
@@ -142,6 +148,9 @@ public class PlayerController {
         }
         if(teamService.getTeamSvincolati().getId_team().equals(playerService.getPlayerById(id).get().getId_team())) {
             return ResponseEntity.status(409).build();
+        }
+        if(train.getPercentuale_tiri() < 0 || train.getTempo_corsa() < 0) {
+            return ResponseEntity.status(400).build();
         }
         train.setId_player(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "train" non si rischia di modificare un allenamento vecchio.
         trainService.saveTrain(train);
