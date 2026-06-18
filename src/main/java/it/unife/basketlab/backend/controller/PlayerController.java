@@ -149,7 +149,7 @@ public class PlayerController {
         if(teamService.getTeamSvincolati().getId_team().equals(playerService.getPlayerById(id).get().getId_team())) {
             return ResponseEntity.status(409).build();
         }
-        if(train.getPercentuale_tiri() < 0 || train.getTempo_corsa() <= 0) {
+        if(train.getPercentuale_tiri() < 0 || train.getPercentuale_tiri() > 100 || train.getTempo_corsa() <= 0) {
             return ResponseEntity.status(400).build();
         }
         train.setId_player(id); // L'ID viene forzato ad essere quello specificato nel parametro, così se il client lo include nell'oggetto "train" non si rischia di modificare un allenamento vecchio.
