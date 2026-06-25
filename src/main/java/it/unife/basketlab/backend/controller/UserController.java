@@ -18,7 +18,7 @@ import it.unife.basketlab.backend.service.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
