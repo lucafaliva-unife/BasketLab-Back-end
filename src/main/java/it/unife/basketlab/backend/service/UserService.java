@@ -20,7 +20,7 @@ public class UserService {
     -> Se lo username esiste allora ritorna l'utente;
     -> Se lo username non esiste allora ritorna null.
     */
-    private User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         List<User> allUsers= repository.findAll();
         for(User user : allUsers) {
             if(user.getUsername().equals(username)) {

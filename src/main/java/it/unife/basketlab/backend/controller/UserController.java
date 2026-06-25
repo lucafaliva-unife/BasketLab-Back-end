@@ -96,12 +96,12 @@ public class UserController {
         -> aver verificato che la password sia corretta;
         -> aver verificato che il tipo utente corrisponda;
     Il codice di ritorno è:
-        -> "200 OK" se l'accesso è valido;
+        -> "200 OK" se l'accesso è valido (in più ritorna al client l'ID dello user);
         -> "404 Not Found" se l'username non esiste;
         -> "401 Unauthorized" se la password o il tipo utente sono errati;
     */
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid User user) {
+    public ResponseEntity<String> login(@RequestBody @Valid User user) {
         if(!userService.userExistsByUsername(user.getUsername())) {
             return ResponseEntity.notFound().build();
         }
@@ -111,7 +111,7 @@ public class UserController {
         if(!userService.verifyType(user.getUsername(), user.getType())) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.getUserByUsername(user.getUsername()).getId_user().toString());
     }
 
 }
