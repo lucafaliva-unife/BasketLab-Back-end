@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.unife.basketlab.backend.model.Match;
+import it.unife.basketlab.backend.model.Matches;
 import it.unife.basketlab.backend.repository.MatchRepository;
 
 @Service
@@ -19,14 +19,14 @@ public class MatchService {
     /*
     Ritorna l'elenco di tutti i match.
     */
-    public List<Match> getAllMatches() {
+    public List<Matches> getAllMatches() {
         return repository.findAll();
     }
 
     /*
     Ritorna il match che ha come ID l'ID passato.
     */
-    public Optional<Match> getMatchById(UUID id) {
+    public Optional<Matches> getMatchById(UUID id) {
         return repository.findById(id);
     }
 
@@ -34,7 +34,7 @@ public class MatchService {
     Salva un nuovo match se l'ID del match passato non è già presente, altrimenti modifica quello già presente.
     Infine ritorna la risposta HTTP.
     */
-    public Match saveMatch(Match match) {
+    public Matches saveMatch(Matches match) {
         return repository.save(match);
     }
 
@@ -56,8 +56,8 @@ public class MatchService {
     Elimina tutti i match che hanno come ID del team in casa o in trasferta l'ID passato.
     */
     public void deleteMatchesByTeamId(UUID id) {
-        List<Match> allMatches= getAllMatches();
-        for(Match m : allMatches) {
+        List<Matches> allMatches= getAllMatches();
+        for(Matches m : allMatches) {
             if(m.getTeam_casa().equals(id) || m.getTeam_trasferta().equals(id)) {
                 deleteMatchById(m.getId_match());
             }

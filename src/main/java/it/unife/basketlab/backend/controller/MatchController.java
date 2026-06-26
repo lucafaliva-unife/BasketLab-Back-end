@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.unife.basketlab.backend.model.Match;
+import it.unife.basketlab.backend.model.Matches;
 import it.unife.basketlab.backend.service.MatchService;
 import it.unife.basketlab.backend.service.PlayerService;
 import it.unife.basketlab.backend.service.TeamService;
@@ -40,7 +40,7 @@ public class MatchController {
     Il codice di ritorno è sempre "200 OK".
     */
     @GetMapping
-    public List<Match> getMatch() {
+    public List<Matches> getMatch() {
         return matchService.getAllMatches();
     }
 
@@ -60,7 +60,7 @@ public class MatchController {
             -> il numero di players di una delle due squadre è < 5.
     */
     @PostMapping
-    public ResponseEntity<Void> createMatch(@RequestBody @Valid Match match) {
+    public ResponseEntity<Void> createMatch(@RequestBody @Valid Matches match) {
         if(!teamService.teamExistsById(match.getTeam_casa()) || ! teamService.teamExistsById(match.getTeam_trasferta())) {
             return ResponseEntity.badRequest().build();
         }
@@ -124,7 +124,7 @@ public class MatchController {
             -> uno dei due team ha un numero insufficiente di giocatori;
     */
     @PutMapping("/{id}")
-    public ResponseEntity<Void> editMatchById(@PathVariable UUID id, @RequestBody @Valid Match match) {
+    public ResponseEntity<Void> editMatchById(@PathVariable UUID id, @RequestBody @Valid Matches match) {
         if(!teamService.teamExistsById(match.getTeam_casa()) || ! teamService.teamExistsById(match.getTeam_trasferta())) {
             return ResponseEntity.badRequest().build();
         }

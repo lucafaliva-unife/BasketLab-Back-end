@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-public class Match {
+public class Matches {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -25,10 +25,10 @@ public class Match {
     private UUID team_trasferta;
 
     @NotNull
-    private int punti_casa;
+    private Integer punti_casa;
 
     @NotNull
-    private int punti_trasferta;
+    private Integer punti_trasferta;
 
     @NotBlank
     private String data;
