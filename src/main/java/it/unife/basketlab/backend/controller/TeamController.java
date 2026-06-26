@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import it.unife.basketlab.backend.DTO.AnalyticsDTO;
 import it.unife.basketlab.backend.model.Player;
 import it.unife.basketlab.backend.model.Team;
+import it.unife.basketlab.backend.service.MatchService;
 import it.unife.basketlab.backend.service.PlayerService;
 import it.unife.basketlab.backend.service.TeamService;
 
@@ -25,6 +26,9 @@ public class TeamController {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private MatchService matchService;
 
     private String svincolatiTeamName= "Svincolati";
 
@@ -119,7 +123,7 @@ public class TeamController {
     Elimina dal DB un team esistente dopo:
         -> essersi assicurato che non si intenda eliminare il team degli svincolati (check sull'ID);
         -> essersi assicurato che l'ID passato esista;
-    Prima di eliminare il team sposta tutti i suoi giocatori nel team "Svincolati".
+    Prima di eliminare il team sposta tutti i suoi giocatori nel team "Svincolati" ed elimina i suoi match.
     Il codice di ritorno è:
         -> "204 No Content" se vengono passati tutti i controlli ed il team viene modificato correttamente;
         -> "404 Not Found" se l'ID passato non esiste;
@@ -132,6 +136,7 @@ public class TeamController {
         }
         try {
             playerService.movePlayersToSvincolatiByTeamId(id);
+            matchService.deleteMatchesByTeamId(id);
             teamService.deleteTeamById(id);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e) {
